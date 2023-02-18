@@ -9,10 +9,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.evrazhackaton.service.dto.ExgausterMomentDto;
 import ru.evrazhackaton.service.entity.ExgausterMoment;
+import ru.evrazhackaton.service.entity.NotificationTopic;
 import ru.evrazhackaton.service.mapper.EntityMapper;
 import ru.evrazhackaton.service.repository.ExgausterMomentRepository;
 import ru.evrazhackaton.service.repository.MappingRepository;
 import ru.evrazhackaton.service.service.ExgausterService;
+import ru.evrazhackaton.service.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class ExgausterServiceImpl implements ExgausterService {
     ExgausterMomentRepository exgausterMomentRepository;
     MappingRepository mappingRepository;
     EntityMapper<ExgausterMoment, ExgausterMomentDto> entityMapper;
+    NotificationService notificationService;
     static final Sort exgaustedSort = Sort.by(Sort.Direction.DESC,"moment");
 
     @Override
@@ -40,6 +43,12 @@ public class ExgausterServiceImpl implements ExgausterService {
     public Flux<ExgausterMomentDto> getByExgausterNumber(Integer number) {
         return exgausterMomentRepository
                 .getAllByExgauster(number, exgaustedSort)
+                .map(entityMapper::mapFromEntity);
+    }
+
+    @Override
+    public Flux<ExgausterMomentDto> listenToSaved() {
+        return notificationService.listen(NotificationTopic.MOMENT_SAVED, ExgausterMoment.class)
                 .map(entityMapper::mapFromEntity);
     }
 

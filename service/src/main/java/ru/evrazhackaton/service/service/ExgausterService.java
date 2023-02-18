@@ -7,6 +7,6 @@ import ru.evrazhackaton.service.dto.ExgausterMomentDto;
 public interface ExgausterService {
     Flux<ExgausterMomentDto> saveAll(Flux<ExgausterMomentDto> exgausterMomentDtoFlux);
     Flux<ExgausterMomentDto> getByExgausterNumber(Integer number);
-
+    Flux<ExgausterMomentDto> listenToSaved();
     Mono<ExgausterMomentDto> save(ExgausterMomentDto dto);
 }

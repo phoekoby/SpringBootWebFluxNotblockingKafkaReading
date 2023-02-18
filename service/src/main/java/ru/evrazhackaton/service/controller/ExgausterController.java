@@ -25,7 +25,8 @@ public class ExgausterController {
     @GetMapping("/exgauster-stream-info/{number}")
     public Flux<ExgausterMomentDto> subscribeForExgauster(@PathVariable Integer number){
         Flux<ExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number);
-        return Flux.merge(byExgausterNumber, kafkaFlux);
+        Flux<ExgausterMomentDto> listenCurrent = exgausterService.listenToSaved();
+        return Flux.merge(byExgausterNumber, listenCurrent);
     }
 
 }
