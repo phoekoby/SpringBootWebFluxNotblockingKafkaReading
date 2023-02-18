@@ -1,7 +1,6 @@
 package ru.evrazhackaton.service.config;
 
 
-import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -20,7 +19,7 @@ public class HazelCastConfig {
 
     @Bean
     public HazelcastInstance hazelcastInstanceBean() {
-        return Hazelcast.newHazelcastInstance(new Config().setInstanceName(UUID.randomUUID().toString()));
+        return Hazelcast.newHazelcastInstance(new Config().setClassLoader(this.getClass().getClassLoader()).setInstanceName(UUID.randomUUID().toString()));
     }
 
     @Bean
@@ -35,7 +34,7 @@ public class HazelCastConfig {
     }
 
     @Bean
-    public IMap<Long, MappingEntity> mappingCacheByPlace(HazelcastInstance hazelcastInstanceBean){
+    public IMap<String, MappingEntity> mappingCacheByPlace(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("mappingCacheByPlace");
     }
 }

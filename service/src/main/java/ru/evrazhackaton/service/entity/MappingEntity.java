@@ -7,10 +7,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.io.Serializable;
+
 @Table("mapping")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MappingEntity {
+public class MappingEntity implements Serializable {
     @Id
     Long id;
 

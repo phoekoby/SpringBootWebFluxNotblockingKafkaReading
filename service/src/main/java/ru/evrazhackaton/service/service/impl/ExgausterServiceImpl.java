@@ -3,6 +3,7 @@ package ru.evrazhackaton.service.service.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,7 @@ import ru.evrazhackaton.service.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExgausterServiceImpl implements ExgausterService {
     ExgausterMomentRepository exgausterMomentRepository;
@@ -64,7 +66,7 @@ public class ExgausterServiceImpl implements ExgausterService {
 
     @Override
     public Flux<OutputExgausterMomentDto> getAll() {
-        return exgausterMomentRepository.findAll()
+        return exgausterMomentRepository.findAll(exgaustedSort)
                 .flatMap(this::mapToOutput);
     }
 

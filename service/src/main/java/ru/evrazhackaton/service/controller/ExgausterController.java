@@ -28,7 +28,6 @@ public class ExgausterController {
         Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number);
         Flux<OutputExgausterMomentDto> listenCurrent = exgausterService.listenToSaved(number);
         return Flux.merge(byExgausterNumber, listenCurrent)
-                .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -39,7 +38,6 @@ public class ExgausterController {
     @GetMapping("/exgauster-history/{number}")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyHistory(@PathVariable Integer number){
         return exgausterService.getByExgausterNumber(number)
-                .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -50,7 +48,6 @@ public class ExgausterController {
     @GetMapping("/exgauster-realtime/{number}")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyRealTime(@PathVariable Integer number){
          return exgausterService.listenToSaved(number)
-                 .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                  .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                     .retry(Duration.ofSeconds(4L))
                     .event(event.getClass().getSimpleName())
@@ -61,7 +58,6 @@ public class ExgausterController {
     @GetMapping("/exgausters-realtime")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyRealTimeForAll(){
         return exgausterService.listenToSaved()
-                .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -72,7 +68,6 @@ public class ExgausterController {
     @GetMapping("/exgausters-history")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyHistoryForAll(){
         return exgausterService.getAll()
-                .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -85,7 +80,6 @@ public class ExgausterController {
         Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getAll();
         Flux<OutputExgausterMomentDto> listenCurrent = exgausterService.listenToSaved();
         return Flux.merge(byExgausterNumber, listenCurrent)
-                .sort(Comparator.comparing(OutputExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
