@@ -18,6 +18,24 @@ CREATE TABLE exgauster_moment
     moment     timestamp
 );
 
+
+CREATE FUNCTION notify_moment_saved()
+    RETURNS TRIGGER
+AS
+$$
+BEGIN
+    PERFORM pg_notify('MOMENT_SAVED',  row_to_json(NEW)::text);
+    RETURN NULL;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER item_saved_trigger
+    AFTER INSERT OR UPDATE
+    ON exgauster_moment
+    FOR EACH ROW
+EXECUTE PROCEDURE notify_moment_saved();
+
 INSERT INTO mapping (place, type, comment, exgauster, active)
 VALUES ('SM_Exgauster\[0:0]', 'analog', 'Горизонтал вибрация подшипника №1. Эксгаустер №3', 3, 1);
 INSERT INTO mapping (place, type, comment, exgauster, active)
