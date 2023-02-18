@@ -24,13 +24,8 @@ public class NotificationServiceImpl implements NotificationService {
     private PostgresqlConnection connection;
     private final ObjectMapper objectMapper;
 
-    /**
-     * Listen to a postgreSQL topic
-     *
-     * @param topic Topic to which the connection needs to subscribe
-     * @param clazz class of the notification parameter (used for deserialization)
-     * @return the notification parameters
-     */
+
+
     public <T> Flux<T> listen(final NotificationTopic topic, final Class<T> clazz) {
         return Mono.fromCompletionStage(watchedTopics.addAsync(topic).thenApply(nt -> nt == null ? NotificationTopic.NONE : nt))
                 .flatMap(nt -> {
@@ -76,29 +71,10 @@ public class NotificationServiceImpl implements NotificationService {
                  .block();
     }
 
-    /**
-     * Execute the SQL statement used to listen to a given topic
-     *
-     * @param topic Name of the topic to listen to
-     */
-    private Mono<Void> executeListenStatement(final NotificationTopic topic) {
 
-        // Topic in upper-case must be surrounded by quotes
+    private Mono<Void> executeListenStatement(final NotificationTopic topic) {
        return connection.createStatement(String.format("LISTEN \"%s\"", topic))
                .execute()
                .then();
-    }
-
-    /**
-     * Execute the SQL statement used to unlisten from a given topic
-     *
-     * @param topic Name of the topic to unlisten from
-     */
-    private Mono<Void> executeUnlistenStatement(final NotificationTopic topic) {
-
-        // Topic in upper-case must be surrounded by quotes
-       return connection.createStatement(String.format("UNLISTEN \"%s\"", topic))
-                .execute()
-                .then();
     }
 }

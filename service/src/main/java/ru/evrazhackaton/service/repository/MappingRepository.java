@@ -8,6 +8,5 @@ import ru.evrazhackaton.service.entity.MappingEntity;
 
 @Repository
 public interface MappingRepository extends R2dbcRepository<MappingEntity, Long> {
-    Flux<MappingEntity> getAllByExgauster(Integer exgauster);
     Mono<MappingEntity> getByPlace(String place);
 }
