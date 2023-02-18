@@ -1,30 +1,26 @@
 package ru.evrazhackaton.service.entity;
 
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.sql.Timestamp;
 
 @Table
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ExgausterMoment {
+public class MappingEntity {
     @Id
     Long id;
 
-    @Column("key")
-    String key;
+    String place;
 
-    @Column("mapping_id")
-    Long mappingId;
+    String type;
 
-    @Column("value")
-    Double value;
+    String code;
 
-    @Column("moment")
-    Timestamp moment;
+    Integer exgauster;
+
+    Integer active;
 }

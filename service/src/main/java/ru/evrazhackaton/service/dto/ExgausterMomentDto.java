@@ -2,7 +2,6 @@ package ru.evrazhackaton.service.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.relational.core.mapping.Column;
 
 import java.sql.Timestamp;
 
