@@ -35,28 +35,24 @@ public class NotificationServiceImpl implements NotificationService {
         return Mono.fromCompletionStage(watchedTopics.addAsync(topic).thenApply(nt -> nt == null ? NotificationTopic.NONE : nt))
                 .flatMap(nt -> {
                     if(nt == NotificationTopic.NONE){
-                        System.out.println("NT is none, execute");
-                        return executeListenStatement(nt);
+                        return executeListenStatement(topic)
+                                .then(Mono.just(topic));
                     }
-                    System.out.println("NT is non none, not execute");
-                    return Mono.just(nt);
-                }).flatMapMany(nt -> connection.getNotifications()
-                        .filter(notification -> topic.name().equals(notification.getName()) && notification.getParameter() != null)
-                        .map(notification -> {
-                            final String json = notification.getParameter();
-                            try {
-                                return objectMapper.readValue(json, clazz);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                }));
+                    return Mono.just(topic);
+                })
+                .flatMapMany(nt -> connection.getNotifications()
+                    .filter(notification -> topic.name().equals(notification.getName()) && notification.getParameter() != null)
+                    .flatMap(notification -> {
+                        final String json = notification.getParameter();
+                        try {
+                            return Mono.just(objectMapper.readValue(json, clazz));
+                        } catch (JsonProcessingException e) {
+                            return Flux.error(new RuntimeException(e));
+                        }
+                    }));
     }
 
-    /**
-     * Unlisten from a postgreSQL topic
-     *
-     * @param topic Topic to which the connection needs to unsubscribe
-     */
+
     public Mono<Void> unlisten(final NotificationTopic topic) {
         return Mono.fromCompletionStage(watchedTopics.addAsync(topic).thenApply(nt -> nt == null ? NotificationTopic.NONE : nt))
                 .filter(nt -> nt.equals(NotificationTopic.NONE))

@@ -47,9 +47,10 @@ public class ExgausterServiceImpl implements ExgausterService {
     }
 
     @Override
-    public Flux<ExgausterMomentDto> listenToSaved() {
+    public Flux<ExgausterMomentDto> listenToSaved(Integer number) {
         return notificationService.listen(NotificationTopic.MOMENT_SAVED, ExgausterMoment.class)
-                .map(entityMapper::mapFromEntity);
+                .map(entityMapper::mapFromEntity)
+                .filter(exgausterMomentDto -> exgausterMomentDto.getExgauster().equals(number));
     }
 
     @Override
