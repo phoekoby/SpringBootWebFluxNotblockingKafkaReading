@@ -1,7 +1,6 @@
 package ru.evrazhackaton.service.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -11,8 +10,12 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.sql.Timestamp;
 
 @Table
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 @Accessors(chain = true)
 public class ExgausterMoment {
     @Id

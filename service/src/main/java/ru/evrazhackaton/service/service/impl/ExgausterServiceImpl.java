@@ -21,23 +21,34 @@ public class ExgausterServiceImpl implements ExgausterService {
     ExgausterMomentRepository exgausterMomentRepository;
     MappingRepository mappingRepository;
     EntityMapper<ExgausterMoment, ExgausterMomentDto> entityMapper;
-    static final Sort exgaustedSort = Sort.by("moment");
+    static final Sort exgaustedSort = Sort.by(Sort.Direction.DESC,"moment");
 
     @Override
     public Flux<ExgausterMomentDto> saveAll(Flux<ExgausterMomentDto> exgausterMomentDtoFlux) {
         return exgausterMomentRepository.saveAll(exgausterMomentDtoFlux.map(entityMapper::mapFromDto)
-                                                                        .flatMap(this::setMappingId))
-                                        .map(entityMapper::mapFromEntity);
+                        .flatMap(this::setMappingId))
+                .map(entityMapper::mapFromEntity);
     }
 
-    private Mono<ExgausterMoment> setMappingId(ExgausterMoment exgausterMoment){
+    private Mono<ExgausterMoment> setMappingId(ExgausterMoment exgausterMoment) {
         return mappingRepository.getByPlace(exgausterMoment.getKey())
                 .map(mappingEntity -> exgausterMoment.setMappingId(mappingEntity.getId()));
     }
 
     @Override
     public Flux<ExgausterMomentDto> getByExgausterNumber(Integer number) {
-        return exgausterMomentRepository.getAllByExgauster(number, exgaustedSort)
+        return exgausterMomentRepository
+                .getAllByExgauster(number, exgaustedSort)
+                .map(entityMapper::mapFromEntity);
+    }
+
+    @Override
+    public Mono<ExgausterMomentDto> save(ExgausterMomentDto dto) {
+        return Mono
+                .just(dto)
+                .map(entityMapper::mapFromDto)
+                .flatMap(this::setMappingId)
+                .flatMap(exgausterMomentRepository::save)
                 .map(entityMapper::mapFromEntity);
     }
 }

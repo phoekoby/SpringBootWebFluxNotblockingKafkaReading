@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table
+@Table("mapping")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MappingEntity {
@@ -18,7 +18,7 @@ public class MappingEntity {
 
     String type;
 
-    String code;
+    String comment;
 
     Integer exgauster;
 

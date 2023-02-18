@@ -8,16 +8,21 @@ import ru.evrazhackaton.service.entity.ExgausterMoment;
 public class ExgausterMomentMapper implements EntityMapper<ExgausterMoment, ExgausterMomentDto> {
     @Override
     public ExgausterMoment mapFromDto(ExgausterMomentDto dto) {
-        return null;
+        return ExgausterMoment
+                .builder()
+                .moment(dto.getMoment())
+                .key(dto.getKey())
+                .value(dto.getValue())
+                .build();
     }
 
     @Override
     public ExgausterMomentDto mapFromEntity(ExgausterMoment entity) {
-        return null;
-    }
-
-    @Override
-    public void update(ExgausterMoment entity, ExgausterMomentDto dto) {
-
+        return ExgausterMomentDto
+                .builder()
+                .moment(entity.getMoment())
+                .key(entity.getKey())
+                .value(entity.getValue())
+                .build();
     }
 }
