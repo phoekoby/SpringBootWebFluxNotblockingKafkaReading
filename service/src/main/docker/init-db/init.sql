@@ -14,6 +14,7 @@ CREATE TABLE exgauster_moment
     key        varchar(64),
     mapping_id bigint references mapping (id),
     value      numeric,
+    exgauster  integer,
     moment     timestamp
 );
 

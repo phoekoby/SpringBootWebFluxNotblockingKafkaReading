@@ -13,6 +13,7 @@ public class ExgausterMomentMapper implements EntityMapper<ExgausterMoment, Exga
                 .moment(dto.getMoment())
                 .key(dto.getKey())
                 .value(dto.getValue())
+                .exgauster(dto.getExgauster())
                 .build();
     }
 
@@ -23,6 +24,7 @@ public class ExgausterMomentMapper implements EntityMapper<ExgausterMoment, Exga
                 .moment(entity.getMoment())
                 .key(entity.getKey())
                 .value(entity.getValue())
+                .exgauster(entity.getExgauster())
                 .build();
     }
 }

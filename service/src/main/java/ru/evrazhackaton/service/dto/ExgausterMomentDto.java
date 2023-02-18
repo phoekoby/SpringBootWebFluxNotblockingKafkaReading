@@ -14,4 +14,5 @@ public class ExgausterMomentDto {
     String key;
     Double value;
     Timestamp moment;
+    Integer exgauster;
 }

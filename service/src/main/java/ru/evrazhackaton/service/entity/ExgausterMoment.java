@@ -30,6 +30,9 @@ public class ExgausterMoment {
     @Column("value")
     Double value;
 
+    @Column("exgauster")
+    Integer exgauster;
+
     @Column("moment")
     Timestamp moment;
 }

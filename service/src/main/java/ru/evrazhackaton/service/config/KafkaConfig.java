@@ -16,6 +16,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import reactor.kafka.receiver.ReceiverOptions;
 import ru.evrazhackaton.service.dto.ExgausterMomentDto;
+import ru.evrazhackaton.service.repository.ExgausterMomentRepository;
+import ru.evrazhackaton.service.repository.MappingRepository;
 import ru.evrazhackaton.service.service.ExgausterService;
 
 import java.sql.Timestamp;
@@ -34,8 +36,7 @@ import java.util.stream.Collectors;
 public class KafkaConfig {
     ExgausterService exgausterService;
 
-    @Value(value = "${FAKE_CONSUMER_DTO_TOPIC}")
-    private String topic;
+
     @Bean
     public ReceiverOptions<String, Map<String, Object>> kafkaReceiverOptions(@Value(value = "${FAKE_CONSUMER_DTO_TOPIC}") String topic, KafkaProperties kafkaProperties) {
         ReceiverOptions<String, Map<String, Object>> basicReceiverOptions = ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
@@ -47,8 +48,9 @@ public class KafkaConfig {
         return new ReactiveKafkaConsumerTemplate<>(kafkaReceiverOptions);
     }
 
+
     @Bean
-    public Disposable exgausterMomentDtoFlux(ReactiveKafkaConsumerTemplate<String, Map<String, Object>> reactiveKafkaConsumerTemplate){
+    public Flux<ExgausterMomentDto> kafkaFlux(ReactiveKafkaConsumerTemplate<String, Map<String, Object>> reactiveKafkaConsumerTemplate){
         return reactiveKafkaConsumerTemplate
                 .receiveAutoAck()
                 .map(ConsumerRecord::value)
@@ -61,15 +63,21 @@ public class KafkaConfig {
                         Timestamp timestamp = new Timestamp(date.getTime());
                         return Flux.fromIterable(mapa.entrySet().stream()
                                 .map(entry -> ExgausterMomentDto.builder()
-                                    .moment(timestamp)
-                                    .key(entry.getKey())
-                                    .value((Double) entry.getValue())
-                                    .build())
+                                        .moment(timestamp)
+                                        .key(entry.getKey())
+                                        .value((Double) entry.getValue())
+                                        .build())
                                 .collect(Collectors.toList()));
                     } catch (ParseException e) {
                         return Flux.error(new RuntimeException(e));
                     }
-                })
+                });
+    }
+
+
+    @Bean
+    public Disposable exgausterMomentDtoFlux(Flux<ExgausterMomentDto> kafkaFlux){
+        return kafkaFlux.share()
                 .flatMap(exgausterService::save)
                 .checkpoint("Saved to DB")
                 .subscribe();

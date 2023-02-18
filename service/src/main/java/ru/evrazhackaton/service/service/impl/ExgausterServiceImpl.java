@@ -32,7 +32,8 @@ public class ExgausterServiceImpl implements ExgausterService {
 
     private Mono<ExgausterMoment> setMappingId(ExgausterMoment exgausterMoment) {
         return mappingRepository.getByPlace(exgausterMoment.getKey())
-                .map(mappingEntity -> exgausterMoment.setMappingId(mappingEntity.getId()));
+                .map(mappingEntity -> exgausterMoment.setMappingId(mappingEntity.getId())
+                        .setExgauster(mappingEntity.getExgauster()));
     }
 
     @Override
