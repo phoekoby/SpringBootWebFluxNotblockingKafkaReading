@@ -73,7 +73,6 @@ public class KafkaConfig {
                     }
                 })
                 .flatMap(exgausterService::save)
-                .checkpoint("Saved to DB")
                 .subscribe();
     }
 

@@ -20,11 +20,12 @@ import java.util.Comparator;
 public class ExgausterController {
     ExgausterService exgausterService;
 
-    @GetMapping("/exgauster-stream-info-sse/{number}")
-    public Flux<ServerSentEvent<ExgausterMomentDto>> subscribeForExgausterSse(@PathVariable Integer number){
+    @GetMapping("/exgauster-history-with-realtime/{number}")
+    public Flux<ServerSentEvent<ExgausterMomentDto>> getHistoryWithRealTime(@PathVariable Integer number){
         Flux<ExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number);
         Flux<ExgausterMomentDto> listenCurrent = exgausterService.listenToSaved(number);
         return Flux.merge(byExgausterNumber, listenCurrent)
+                .sort(Comparator.comparing(ExgausterMomentDto::getMoment))
                 .map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -32,14 +33,26 @@ public class ExgausterController {
                         .build());
     }
 
-    @GetMapping("/listen-exgauster/{number}")
-    public Flux<ServerSentEvent<ExgausterMomentDto>> onlyListen(@PathVariable Integer number){
-        Flux<ExgausterMomentDto> mp = exgausterService.listenToSaved(number);
-         return mp.map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
+    @GetMapping("/exgauster-realtime/{number}")
+    public Flux<ServerSentEvent<ExgausterMomentDto>> getOnlyRealTime(@PathVariable Integer number){
+         return exgausterService.listenToSaved(number)
+                 .sort(Comparator.comparing(ExgausterMomentDto::getMoment))
+                 .map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
                     .retry(Duration.ofSeconds(4L))
                     .event(event.getClass().getSimpleName())
                     .data(event)
                     .build());
+    }
+
+    @GetMapping("/exgauster-realtime/{number}")
+    public Flux<ServerSentEvent<ExgausterMomentDto>> getOnlyHistory(@PathVariable Integer number){
+        return exgausterService.getByExgausterNumber(number)
+                .sort(Comparator.comparing(ExgausterMomentDto::getMoment))
+                .map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
+                        .retry(Duration.ofSeconds(4L))
+                        .event(event.getClass().getSimpleName())
+                        .data(event)
+                        .build());
     }
 
 
