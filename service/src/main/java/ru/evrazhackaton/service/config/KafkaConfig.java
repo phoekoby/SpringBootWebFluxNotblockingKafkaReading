@@ -9,18 +9,19 @@ import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import reactor.kafka.receiver.ReceiverOptions;
 
 import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 public class KafkaConfig {
 
     @Bean
-    public ReceiverOptions<String, String> kafkaReceiverOptions(@Value(value = "${FAKE_CONSUMER_DTO_TOPIC}") String topic, KafkaProperties kafkaProperties) {
-        ReceiverOptions<String, String> basicReceiverOptions = ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
+    public ReceiverOptions<String, Map<String, String>> kafkaReceiverOptions(@Value(value = "${FAKE_CONSUMER_DTO_TOPIC}") String topic, KafkaProperties kafkaProperties) {
+        ReceiverOptions<String, Map<String, String>> basicReceiverOptions = ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
         return basicReceiverOptions.subscription(Collections.singletonList(topic));
     }
 
     @Bean
-    public ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate(ReceiverOptions<String, String> kafkaReceiverOptions) {
+    public ReactiveKafkaConsumerTemplate<String, Map<String, String>> reactiveKafkaConsumerTemplate(ReceiverOptions<String, Map<String, String>> kafkaReceiverOptions) {
         return new ReactiveKafkaConsumerTemplate<>(kafkaReceiverOptions);
     }
 }

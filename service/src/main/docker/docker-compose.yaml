@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+#  evraz-hackaton-mongodb:
+#    image: mongo:4.4.12
+#    volumes:
+#      - ../lcg-file-service/mongodb:/data/db/
+#      - ./init-db/mongo-init-dev.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+#    ports:
+#      - 27017:27017
+  evraz-hackaton-postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../../../../data:/var/lib/postgresql/data
