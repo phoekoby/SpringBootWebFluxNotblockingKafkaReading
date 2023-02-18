@@ -19,7 +19,6 @@ import java.util.Comparator;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExgausterController {
     ExgausterService exgausterService;
-    Flux<ExgausterMomentDto> kafkaFlux;
 
 
     @GetMapping("/exgauster-stream-info/{number}")
@@ -28,5 +27,30 @@ public class ExgausterController {
         Flux<ExgausterMomentDto> listenCurrent = exgausterService.listenToSaved();
         return Flux.merge(byExgausterNumber, listenCurrent);
     }
+
+    @GetMapping("/exgauster-stream-info-sse/{number}")
+    public Flux<ServerSentEvent<ExgausterMomentDto>> subscribeForExgausterSse(@PathVariable Integer number){
+        Flux<ExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number);
+        Flux<ExgausterMomentDto> listenCurrent = exgausterService.listenToSaved();
+        return Flux.merge(byExgausterNumber, listenCurrent)
+                .map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
+                        .retry(Duration.ofSeconds(4L))
+                        .event(event.getClass().getSimpleName())
+                        .data(event)
+                        .build());
+    }
+
+    @GetMapping("/listen")
+    public Flux<ServerSentEvent<ExgausterMomentDto>> onlyListen(){
+        return exgausterService.listenToSaved()
+                .map(event -> ServerSentEvent.<ExgausterMomentDto>builder()
+                        .retry(Duration.ofSeconds(4L))
+                        .event(event.getClass().getSimpleName())
+                        .data(event)
+                        .build());
+    }
+
+
+
 
 }

@@ -2,9 +2,9 @@ package ru.evrazhackaton.service.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import io.r2dbc.postgresql.api.PostgresqlConnection;
-import io.r2dbc.spi.ConnectionFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,6 @@ import ru.evrazhackaton.service.service.NotificationService;
 @RequiredArgsConstructor
 @Service
 public class NotificationServiceImpl implements NotificationService {
-
-    private final ConnectionFactory connectionFactory;
     private final HazelSet<NotificationTopic> watchedTopics;
     private PostgresqlConnection connection;
     private final ObjectMapper objectMapper;
@@ -37,16 +35,20 @@ public class NotificationServiceImpl implements NotificationService {
         return Mono.fromCompletionStage(watchedTopics.addAsync(topic).thenApply(nt -> nt == null ? NotificationTopic.NONE : nt))
                 .flatMap(nt -> {
                     if(nt == NotificationTopic.NONE){
+                        System.out.println("NT is none, execute");
                         return executeListenStatement(nt);
                     }
+                    System.out.println("NT is non none, not execute");
                     return Mono.just(nt);
-                }).flatMapMany(nt -> connection.getNotifications().map(notification -> {
-                    final String json = notification.getParameter();
-                    try {
-                        return objectMapper.readValue(json, clazz);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+                }).flatMapMany(nt -> connection.getNotifications()
+                        .filter(notification -> topic.name().equals(notification.getName()) && notification.getParameter() != null)
+                        .map(notification -> {
+                            final String json = notification.getParameter();
+                            try {
+                                return objectMapper.readValue(json, clazz);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
                 }));
     }
 
@@ -68,9 +70,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     @PostConstruct
     private void postConstruct(){
-        this.connection = Mono.from(connectionFactory.create())
-                .cast(PostgresqlConnection.class)
-                .block();
+         connection = new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
+                .host("localhost")
+                .port(5431)
+                .username("postgres")
+                .password("postgres")
+                .database("postgres")
+                .build()).create()
+                 .block();
     }
 
     /**
@@ -81,7 +88,9 @@ public class NotificationServiceImpl implements NotificationService {
     private Mono<Void> executeListenStatement(final NotificationTopic topic) {
 
         // Topic in upper-case must be surrounded by quotes
-       return connection.createStatement(String.format("LISTEN \"%s\"", topic)).execute().then();
+       return connection.createStatement(String.format("LISTEN \"%s\"", topic))
+               .execute()
+               .then();
     }
 
     /**

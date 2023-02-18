@@ -50,7 +50,7 @@ public class KafkaConfig {
 
 
     @Bean
-    public Flux<ExgausterMomentDto> kafkaFlux(ReactiveKafkaConsumerTemplate<String, Map<String, Object>> reactiveKafkaConsumerTemplate){
+    public Disposable kafkaFlux(ReactiveKafkaConsumerTemplate<String, Map<String, Object>> reactiveKafkaConsumerTemplate){
         return reactiveKafkaConsumerTemplate
                 .receiveAutoAck()
                 .map(ConsumerRecord::value)
@@ -71,15 +71,10 @@ public class KafkaConfig {
                     } catch (ParseException e) {
                         return Flux.error(new RuntimeException(e));
                     }
-                });
-    }
-
-
-    @Bean
-    public Disposable exgausterMomentDtoFlux(Flux<ExgausterMomentDto> kafkaFlux){
-        return kafkaFlux.share()
+                })
                 .flatMap(exgausterService::save)
                 .checkpoint("Saved to DB")
                 .subscribe();
     }
+
 }
