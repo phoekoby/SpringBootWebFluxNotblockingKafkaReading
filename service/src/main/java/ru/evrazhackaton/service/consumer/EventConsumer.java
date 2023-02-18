@@ -8,14 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
 public class EventConsumer {
-    ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate;
+    ReactiveKafkaConsumerTemplate<String, Map<String, String>> reactiveKafkaConsumerTemplate;
 
 
     @PostConstruct
