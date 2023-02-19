@@ -7,7 +7,7 @@ export class Socket {
     constructor(...args) {
         // localhost:8080/api/exgausters-realtime
         let eventSource = new EventSource("http://localhost:8080/api/exgausters-realtime")
-        eventSource.addEventListener('message', event => {
+        eventSource.addEventListener('OutputExgausterMomentDto', event => {
             console.log({event})
         })
         eventSource.onmessage = (...args) => console.log(args)
