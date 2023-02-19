@@ -17,7 +17,6 @@ import java.time.Duration;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @CrossOrigin
 public class ExgausterController {
