@@ -26,7 +26,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
         this.#graphic = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels.map(l => (new Date(l / 1000)).toDateString()),
+                labels: labels.map(l => (new Date(l*1)).toDateString()),
                 datasets: [{
                     label: this.#graphic.getName(),
                     data: labels.map(l => info[l].value * 1),
@@ -50,7 +50,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
         const info = this.#signal.getInfo()
         console.log('updateGraphic', info)
         const labels = Object.keys(info)
-        this.#graphic.data.labels = labels.map(l => (new Date(l / 1000)).toDateString())
+        this.#graphic.data.labels = labels.map(l => (new Date(l * 1)).toDateString())
         this.#graphic.data.datasets[0].data = labels.map(l => info[l].value * 1)
         this.#graphic.update()
     }
