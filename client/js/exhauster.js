@@ -7,16 +7,18 @@ export class Exhauster {
 
     #signals = {}
     #updates = []
+    #id
 
     constructor(id, signals) {
         if((!signals.length && signals.length !== 0) || id*1 < 0){
             throw new Error('Invalid exhauster data')
         }
+        this.#id = id
         this.addSignals(signals)
         setTimeout(() => {
             const all_signals = App.getInstance().getSignalsForExhausterFromHierarchy(id)
             all_signals.forEach(({comment}) => {
-                this.#signals[comment] = this.#signals[comment] || new Signal(comment)
+                this.#signals[comment] = this.#signals[comment] || new Signal(id, comment)
             })
         }, 0)
     }
@@ -27,6 +29,10 @@ export class Exhauster {
             obj[key] = this.#signals[key].getInfo()
         })
         return obj
+    }
+
+    getSignalById(id){
+        return this.#signals[id]
     }
 
     getUpdateSignals(){
@@ -49,7 +55,7 @@ export class Exhauster {
         //console.log({comment, moment, signal})
         if(comment){
             if(!this.#signals[comment]){
-                this.#signals[comment] = new Signal(comment)
+                this.#signals[comment] = new Signal(this.#id, comment)
             }
             this.#signals[comment].addInfo(moment, signal)
             this.#updates.push(comment)

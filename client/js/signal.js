@@ -5,9 +5,11 @@ export class Signal {
     #name
     #log = {}
     #updates = []
+    #exhauster_id
 
-    constructor(name) {
+    constructor(ex_id, name) {
         this.#name = name
+        this.#exhauster_id = ex_id
     }
 
     addInfo(moment, signal){
@@ -27,6 +29,18 @@ export class Signal {
 
     getInfo(){
         return this.#log
+    }
+
+    get(){
+        return this
+    }
+
+    getName(){
+        return this.#name
+    }
+
+    getExhausterId(){
+        return this.#exhauster_id
     }
 
     getUpdates(){

@@ -22,9 +22,11 @@ export default class PopupExhausterWidget extends PopupBaseWidget {
     createNecessarySignals = (signals=null) => {
         const children = this.getChildren()
         signals = signals ? signals : App.getInstance().getExhausterById(this.#key).getSignals()
-        Object.keys(signals).forEach(key => {
-            children["" + key] = children["" + key] || new SignalPreviewWidget(key)
-            this.getContent().appendChild(children["" + key].getElement())
+        Object.keys(signals).sort().forEach(key => {
+            if(children["" + key] === undefined){
+                children["" + key] = new SignalPreviewWidget(this.#key, key)
+                this.getContent().appendChild(children["" + key].getElement())
+            }
         })
     }
 

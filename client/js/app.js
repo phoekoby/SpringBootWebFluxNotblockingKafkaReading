@@ -37,10 +37,18 @@ class App {
         (new Hierarchy()).getData()
             .then((data) => {
                 console.log(data)
+                if(data){
+                    const ex_keys = Array.from(new Set(data.map(x => x.exgauster)))
+                    console.log(ex_keys)
+                    ex_keys.forEach(key => {
+                        this.setExhauster(key, [])
+                    })
+                }
                 this.#hierarchy = data
                 this.refreshConnection()
                 this.addWidgets()
                 setTimeout(this.render, this.#interval)
+                this.#app.classList.add('inited')
                 this.#inited = true
             })
     }
