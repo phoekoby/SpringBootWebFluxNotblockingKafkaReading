@@ -22,7 +22,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
         const ctx = document.getElementById('myChart' + encodeURIComponent(this.#signal.getName()));
 
         const info = this.#signal.getInfo()
-        const labels = Object.keys(info)
+        const labels = Object.keys(info).map(l => l*1).sort()
         this.#graphic = new Chart(ctx, {
             type: 'line',
             data: {
@@ -49,7 +49,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
     updateGraphic = () => {
         const info = this.#signal.getInfo()
         console.log('updateGraphic', info)
-        const labels = Object.keys(info)
+        const labels = Object.keys(info).map(l => l*1).sort()
         this.#graphic.data.labels = labels.map(l => this.formatDate(new Date(l * 1)))
         this.#graphic.data.datasets[0].data = labels.map(l => info[l].value * 1)
         this.#graphic.update()
