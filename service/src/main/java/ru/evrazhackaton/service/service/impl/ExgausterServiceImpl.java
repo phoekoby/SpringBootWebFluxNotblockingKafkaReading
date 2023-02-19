@@ -11,11 +11,9 @@ import reactor.core.publisher.Mono;
 import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.dto.OutputExgausterMomentDto;
 import ru.evrazhackaton.service.entity.ExgausterMoment;
-import ru.evrazhackaton.service.entity.NotificationTopic;
 import ru.evrazhackaton.service.repository.ExgausterMomentRepository;
 import ru.evrazhackaton.service.service.ExgausterService;
 import ru.evrazhackaton.service.service.MappingService;
-import ru.evrazhackaton.service.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,6 @@ import ru.evrazhackaton.service.service.NotificationService;
 public class ExgausterServiceImpl implements ExgausterService {
     ExgausterMomentRepository exgausterMomentRepository;
     MappingService mappingService;
-    NotificationService notificationService;
     static final Sort exgaustedSort = Sort.by(Sort.Direction.DESC,"moment");
 
     @Override
@@ -32,6 +29,43 @@ public class ExgausterServiceImpl implements ExgausterService {
         return exgausterMomentRepository.saveAll(exgausterMomentDtoFlux.flatMap(this::mapFromInput))
                 .flatMap(this::mapToOutput);
     }
+
+    @Override
+    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number) {
+        return exgausterMomentRepository
+                .getAllByExgauster(number, exgaustedSort)
+                .flatMap(this::mapToOutput);
+    }
+
+    @Override
+    public Flux<OutputExgausterMomentDto> getAll() {
+        return exgausterMomentRepository.findAll(exgaustedSort)
+                .flatMap(this::mapToOutput);
+    }
+
+    @Override
+    public Mono<OutputExgausterMomentDto> save(InputExgausterMomentDto dto) {
+        return Mono
+                .just(dto)
+                .flatMap(this::mapFromInput)
+                .flatMap(exgausterMomentRepository::save)
+                .flatMap(this::mapToOutput);
+    }
+
+    @Override
+    public Mono<OutputExgausterMomentDto> convert(InputExgausterMomentDto dto) {
+        return mappingService.getByPlace(dto.getKey())
+                .map(mappingEntity -> OutputExgausterMomentDto.builder()
+                        .moment(dto.getMoment())
+                        .exgausterId(mappingEntity.getExgauster())
+                        .code(mappingEntity.getPlace())
+                        .value(dto.getValue())
+                        .signalType(mappingEntity.getType())
+                        .active(mappingEntity.getActive())
+                        .comment(mappingEntity.getComment())
+                        .build());
+    }
+
 
     private Mono<ExgausterMoment> mapFromInput(InputExgausterMomentDto inputExgausterMomentDto){
         return mappingService.getByPlace(inputExgausterMomentDto.getKey())
@@ -55,40 +89,5 @@ public class ExgausterServiceImpl implements ExgausterService {
                         .code(exgausterMoment.getKey())
                         .moment(exgausterMoment.getMoment())
                         .build());
-    }
-
-    @Override
-    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number) {
-        return exgausterMomentRepository
-                .getAllByExgauster(number, exgaustedSort)
-                .flatMap(this::mapToOutput);
-    }
-
-    @Override
-    public Flux<OutputExgausterMomentDto> getAll() {
-        return exgausterMomentRepository.findAll(exgaustedSort)
-                .flatMap(this::mapToOutput);
-    }
-
-    @Override
-    public Flux<OutputExgausterMomentDto> listenToSaved(Integer number) {
-        return notificationService.listen(NotificationTopic.MOMENT_SAVED, ExgausterMoment.class)
-                .flatMap(this::mapToOutput)
-                .filter(exgausterMomentDto -> exgausterMomentDto.getExgausterId().equals(number));
-    }
-
-    @Override
-    public Flux<OutputExgausterMomentDto> listenToSaved() {
-        return notificationService.listen(NotificationTopic.MOMENT_SAVED, ExgausterMoment.class)
-                .flatMap(this::mapToOutput);
-    }
-
-    @Override
-    public Mono<OutputExgausterMomentDto> save(InputExgausterMomentDto dto) {
-        return Mono
-                .just(dto)
-                .flatMap(this::mapFromInput)
-                .flatMap(exgausterMomentRepository::save)
-                .flatMap(this::mapToOutput);
     }
 }

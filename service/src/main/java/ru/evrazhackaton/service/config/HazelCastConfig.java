@@ -8,11 +8,9 @@ import com.hazelcast.map.IMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.evrazhackaton.service.entity.MappingEntity;
-import ru.evrazhackaton.service.entity.NotificationTopic;
-import ru.evrazhackaton.service.pojo.HazelSet;
+import ru.evrazhackaton.service.entity.StatisticValue;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class HazelCastConfig {
@@ -23,12 +21,6 @@ public class HazelCastConfig {
     }
 
     @Bean
-    public HazelSet<NotificationTopic> watchedTopicsSet(HazelcastInstance hazelcastInstanceBean){
-        IMap<NotificationTopic, NotificationTopic> watchedTopics = hazelcastInstanceBean.getMap("watchedTopicsMap");
-        return new HazelSet<>(watchedTopics, 1, TimeUnit.MINUTES);
-    }
-
-    @Bean
     public IMap<Long, MappingEntity> mappingCacheById(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("mappingCacheById");
     }
@@ -36,5 +28,15 @@ public class HazelCastConfig {
     @Bean
     public IMap<String, MappingEntity> mappingCacheByPlace(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("mappingCacheByPlace");
+    }
+
+    @Bean
+    public IMap<Long, StatisticValue> statisticValueCacheById(HazelcastInstance hazelcastInstanceBean){
+        return hazelcastInstanceBean.getMap("statisticValueCacheById");
+    }
+
+    @Bean
+    public IMap<Long, StatisticValue> statisticValueCacheByMappingId(HazelcastInstance hazelcastInstanceBean){
+        return hazelcastInstanceBean.getMap("statisticValueCacheByMappingId");
     }
 }
