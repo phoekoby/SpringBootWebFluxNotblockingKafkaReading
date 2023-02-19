@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/blocking-api")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class MappingRepository {
+public class MappingController {
     MappingService mappingService;
 
     @GetMapping("/mappings")
