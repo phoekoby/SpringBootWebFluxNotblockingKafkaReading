@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 import ru.evrazhackaton.service.entity.MappingEntity;
 import ru.evrazhackaton.service.service.MappingService;
 
@@ -19,7 +20,7 @@ public class MappingController {
     MappingService mappingService;
 
     @GetMapping("/mappings")
-    public List<MappingEntity> getAllMapping(){
-        return mappingService.getAll().collectList().block();
+    public Mono<List<MappingEntity>> getAllMapping(){
+        return mappingService.getAll().collectList();
     }
 }
