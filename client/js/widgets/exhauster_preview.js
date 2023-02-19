@@ -15,14 +15,14 @@ export default class ExhausterPreviewWidget extends Widget {
     constructor(key) {
         super();
         this.#key = key
-        this.getElement().innerHTML = `<p>Exhauster №${key}</p>`
+        this.getElement().innerHTML = `<p class="widget-exhauster-title">Exhauster №${key}</p>`
 
         this.#dynamic_content = document.createElement('div')
         this.#dynamic_content.classList.add('widget-exhauster-preview-wrapper')
 
         this.#button = document.createElement('div')
         this.#button.classList.add('widget-exhauster-preview-button')
-        this.#button.innerText = '>'
+        this.#button.innerText = 'Детали'
 
         this.addListeners()
         this.getElement().append(this.#dynamic_content, this.#button)
@@ -44,13 +44,15 @@ export default class ExhausterPreviewWidget extends Widget {
 
     renderWidget({exhauster_updates}) {
         const children = this.getChildren()
-        Object.keys(exhauster_updates).slice(0, this.#display_signals_amount).forEach(key => {
-            if(!children[key]){
-                const child = new SignalPreviewWidget(key)
+        Object.keys(exhauster_updates).forEach(key => {
+            if(!children[key] && Object.keys(children).length < this.#display_signals_amount){
+                const child = new SignalPreviewWidget(this.#key, key)
                 children[key] = child
                 this.#dynamic_content.appendChild(child.getElement())
             }
-            children[key].renderWidget({signal_updates: exhauster_updates[key]})
+            if(children[key]){
+                children[key].renderWidget({signal_updates: exhauster_updates[key]})
+            }
         })
     }
 
