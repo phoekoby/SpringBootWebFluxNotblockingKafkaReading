@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.evrazhackaton.service.entity.MappingEntity;
 import ru.evrazhackaton.service.entity.NotificationTopic;
+import ru.evrazhackaton.service.entity.StatisticValue;
 import ru.evrazhackaton.service.pojo.HazelSet;
 
 import java.util.UUID;
@@ -36,5 +37,15 @@ public class HazelCastConfig {
     @Bean
     public IMap<String, MappingEntity> mappingCacheByPlace(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("mappingCacheByPlace");
+    }
+
+    @Bean
+    public IMap<Long, StatisticValue> statisticValueCacheById(HazelcastInstance hazelcastInstanceBean){
+        return hazelcastInstanceBean.getMap("statisticValueCacheById");
+    }
+
+    @Bean
+    public IMap<Long, StatisticValue> statisticValueCacheByMappingId(HazelcastInstance hazelcastInstanceBean){
+        return hazelcastInstanceBean.getMap("statisticValueCacheByMappingId");
     }
 }

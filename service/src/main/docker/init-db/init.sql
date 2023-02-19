@@ -18,6 +18,17 @@ CREATE TABLE exgauster_moment
     moment     timestamp
 );
 
+CREATE TABLE statistic_value
+(
+    id         BIGSERIAL PRIMARY KEY,
+    mapping_id bigint references mapping (id),
+    max_value  numeric default 0,
+    min_value  numeric default 0,
+    curr_value numeric default 0,
+    max_delta_value numeric default 0,
+    min_delta_value numeric default 0
+);
+
 
 CREATE FUNCTION notify_moment_saved()
     RETURNS TRIGGER
