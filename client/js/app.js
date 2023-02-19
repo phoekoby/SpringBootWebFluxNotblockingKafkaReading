@@ -86,7 +86,7 @@ class App {
     update = (_data) => {
         if(this.#stopped) return
         // console.log('app update', this, _data)
-        _data = _data.filter(ex => !!ex.exgausterId)
+        _data = _data.filter(ex => ex.exgausterId !== undefined)
         const data = {}
         _data.forEach(({exgausterId, ...row}) => {
             data[exgausterId] = data[exgausterId] || []
