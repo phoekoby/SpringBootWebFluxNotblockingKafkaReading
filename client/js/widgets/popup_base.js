@@ -26,10 +26,10 @@ export default class PopupBaseWidget extends Widget {
         this.addEventListeners()
         this.getElement().append(this.#title, this.#content, this.#close_btn)
 
-        Object.keys(widgets).forEach(key => {
-            this.getChildren()[key] = widgets[key]
-            this.#content.appendChild(widgets[key].getElement())
-        })
+        // Object.keys(widgets).forEach(key => {
+        //     this.getChildren()[key] = widgets[key]
+        //     this.#content.appendChild(widgets[key].getElement())
+        // })
     }
     
     addEventListeners(){
