@@ -26,7 +26,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
         this.#graphic = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels.map(l => (new Date(l*1)).toDateString()),
+                labels: labels.map(l => this.formatDate(new Date(l*1))),
                 datasets: [{
                     label: this.#signal.getName(),
                     data: labels.map(l => info[l].value * 1),
@@ -50,9 +50,32 @@ export default class PopupSignalWidget extends PopupBaseWidget {
         const info = this.#signal.getInfo()
         console.log('updateGraphic', info)
         const labels = Object.keys(info)
-        this.#graphic.data.labels = labels.map(l => (new Date(l * 1)).toDateString())
+        this.#graphic.data.labels = labels.map(l => this.formatDate(new Date(l * 1)))
         this.#graphic.data.datasets[0].data = labels.map(l => info[l].value * 1)
         this.#graphic.update()
+    }
+
+    formatDate(date) {
+
+        var dd = date.getDate();
+        if (dd < 10) dd = '0' + dd;
+
+        var mm = date.getMonth() + 1;
+        if (mm < 10) mm = '0' + mm;
+
+        var yy = date.getFullYear() % 100;
+        if (yy < 10) yy = '0' + yy;
+
+        let H = date.getHours()
+        if (H < 10) H = '0' + H;
+
+        let i = date.getMinutes()
+        if (i < 10) i = '0' + i;
+
+        let s = date.getSeconds()
+        if (s < 10) s = '0' + s;
+
+        return `${dd}.${mm}.${yy} ${H}:${i}:${s}`;
     }
 
     getClasses() {
