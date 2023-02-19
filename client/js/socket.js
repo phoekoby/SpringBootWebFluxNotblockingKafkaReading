@@ -5,6 +5,13 @@ export class Socket {
     #socket
 
     constructor(...args) {
+        // localhost:8080/api/exgausters-realtime
+        let eventSource = new EventSource("localhost:8080/api/exgausters-realtime");
+
+        eventSource.onmessage = function(event) {
+            console.log("Новое сообщение", event);
+            // этот код выведет в консоль 3 сообщения, из потока данных выше
+        }
         const socket = new io(...args)
         console.log(socket)
 
