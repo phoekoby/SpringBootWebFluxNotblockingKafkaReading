@@ -13,6 +13,7 @@ import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.dto.OutputWarningDto;
 import ru.evrazhackaton.service.entity.MappingEntity;
 import ru.evrazhackaton.service.entity.StatisticValueEntity;
+import ru.evrazhackaton.service.entity.WarningEntity;
 import ru.evrazhackaton.service.service.AnalyzeService;
 import ru.evrazhackaton.service.service.ExgausterService;
 import ru.evrazhackaton.service.service.MappingService;
@@ -38,7 +39,20 @@ public class AnalyzeServiceImpl implements AnalyzeService {
                     InputExgausterMomentDto exgausterMomentDto = data.getT1();
                     MappingEntity mapping = data.getT2();
                     StatisticValueEntity statisticValue = tuple.getT2();
+                    if(statisticValue.getId() == null){
+                        statisticValue.setAllSummedValue(exgausterMomentDto.getValue().toString());
+                        statisticValue.setCurrValue(exgausterMomentDto.getValue());
+                        statisticValue.setMappingId(mapping.getId());
+                        statisticValue.setCountOfAll(1L);
+                        return statisticValueService.save(statisticValue);
+                    }else{
+
+                    }
                 })*/
                 .subscribe();
     }
+
+   /* Tuple2<WarningEntity, Boolean> needToSendWarning(){
+
+    }*/
 }
