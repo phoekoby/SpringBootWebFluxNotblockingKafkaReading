@@ -28,6 +28,7 @@ export default class PopupSignalWidget extends PopupBaseWidget {
             data: {
                 labels: labels.map(l => (new Date(l / 1000)).toDateString()),
                 datasets: [{
+                    label: this.#graphic.getName(),
                     data: labels.map(l => info[l].value * 1),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
