@@ -26,8 +26,8 @@ public class ExgausterController {
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getHistoryWithRealTime(@PathVariable Integer number,
                                                                                   @RequestParam(defaultValue = "1", required = false) int page,
                                                                                   @RequestParam(defaultValue = "20", required = false) int size,
-                                                                                  @RequestParam(defaultValue = "moment", required = false) String sort){
-        Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number, PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));
+                                                                                  @RequestParam(defaultValue = "moment", required = false) String sortedField){
+        Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number, page, size, sortedField);
         Flux<OutputExgausterMomentDto> listenCurrent = exgausterService.getRealTimeByExgausterNumber(number);
         return Flux.merge(byExgausterNumber, listenCurrent)
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
@@ -39,10 +39,10 @@ public class ExgausterController {
 
     @GetMapping("/exgauster-history/{number}")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyHistory(@PathVariable Integer number,
-                                                                          @RequestParam(defaultValue = "1", required = false) int page,
+                                                                          @RequestParam(defaultValue = "0", required = false) int page,
                                                                           @RequestParam(defaultValue = "20", required = false) int size,
                                                                           @RequestParam(defaultValue = "moment", required = false) String sort){
-        return exgausterService.getByExgausterNumber(number, PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))))
+        return exgausterService.getByExgausterNumber(number, page, size, sort)
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -71,7 +71,7 @@ public class ExgausterController {
     }
 
     @GetMapping("/exgausters-history")
-    public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyHistoryForAll(@RequestParam(defaultValue = "1", required = false) int page,
+    public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyHistoryForAll(@RequestParam(defaultValue = "0", required = false) int page,
                                                                                 @RequestParam(defaultValue = "20", required = false) int size,
                                                                                 @RequestParam(defaultValue = "moment", required = false) String sort){
         return exgausterService.getAll(PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))))
@@ -83,7 +83,7 @@ public class ExgausterController {
     }
 
     @GetMapping("/exgausters-history-with-realtime")
-    public Flux<ServerSentEvent<OutputExgausterMomentDto>> getHistoryWithRealTimeForAll(@RequestParam(defaultValue = "1", required = false) int page,
+    public Flux<ServerSentEvent<OutputExgausterMomentDto>> getHistoryWithRealTimeForAll(@RequestParam(defaultValue = "0", required = false) int page,
                                                                                          @RequestParam(defaultValue = "20", required = false) int size,
                                                                                          @RequestParam(defaultValue = "moment", required = false) String sort){
         Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getAll(PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));

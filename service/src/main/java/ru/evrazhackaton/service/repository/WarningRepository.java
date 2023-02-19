@@ -12,8 +12,11 @@ public interface WarningRepository extends R2dbcRepository<WarningEntity, Long> 
 
     @Query("select w.* from warning w " +
             "join mapping m on m.id = w.mapping_id " +
-            "where m.exgauster = :exgauster")
-    Flux<WarningEntity> getAllByExgauster(Integer exgauster, Pageable pageable);
+            "where m.exgauster = :exgauster " +
+            "order by :sortedField " +
+            "limit :limit " +
+            "offset  :offset")
+    Flux<WarningEntity> getAllByExgauster(Integer exgauster, Integer limit, Integer offset, String sortedField);
 
     Flux<WarningEntity> findAllBy(Pageable pageable);
 }

@@ -19,32 +19,29 @@ public class WarningController {
 
     @GetMapping("/exgauster-warnings-history-with-realtime/{number}")
     public Flux<OutputWarningDto> getWarningsByExgausterRealTimeWithHistory(@PathVariable Integer number,
-                                                         @RequestParam(defaultValue = "1", required = false) int page,
+                                                         @RequestParam(defaultValue = "0", required = false) int page,
                                                          @RequestParam(defaultValue = "20", required = false) int size,
-                                                         @RequestParam(defaultValue = "create_date", required = false) String sort){
-        Flux<OutputWarningDto> allByExgausterNumber = warningsService.getAllByExgausterNumber(number, PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));
+                                                         @RequestParam(defaultValue = "create_date", required = false) String sortedField){
+        Flux<OutputWarningDto> allByExgausterNumber = warningsService.getAllByExgausterNumber(number, size, page, sortedField);
         Flux<OutputWarningDto> realTimeByExgauster = warningsService.getRealTimeByExgauster(number);
         return Flux.merge(allByExgausterNumber, realTimeByExgauster);
     }
 
     @GetMapping("/exgauster-warnings-history/{number}")
     public Flux<OutputWarningDto> getWarningsByExgausterHistory(@PathVariable Integer number,
-                                                         @RequestParam(defaultValue = "1", required = false) int page,
+                                                         @RequestParam(defaultValue = "0", required = false) int page,
                                                          @RequestParam(defaultValue = "20", required = false) int size,
-                                                         @RequestParam(defaultValue = "create_date", required = false) String sort){
-        return warningsService.getAllByExgausterNumber(number, PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));
+                                                         @RequestParam(defaultValue = "create_date", required = false) String sortedField){
+        return warningsService.getAllByExgausterNumber(number, size, page, sortedField);
     }
 
     @GetMapping("/exgauster-warnings-realtime/{number}")
-    public Flux<OutputWarningDto> getWarningsByExgausterRealTime(@PathVariable Integer number,
-                                                                @RequestParam(defaultValue = "1", required = false) int page,
-                                                                @RequestParam(defaultValue = "20", required = false) int size,
-                                                                @RequestParam(defaultValue = "create_date", required = false) String sort){
+    public Flux<OutputWarningDto> getWarningsByExgausterRealTime(@PathVariable Integer number){
         return warningsService.getRealTimeByExgauster(number);
     }
 
     @GetMapping("/exgausters-warnings-history-with-realtime")
-    public Flux<OutputWarningDto> getWarningsByExgausterRealTimeWithHistory(@RequestParam(defaultValue = "1", required = false) int page,
+    public Flux<OutputWarningDto> getWarningsByExgausterRealTimeWithHistory(@RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "20", required = false) int size,
                                                                             @RequestParam(defaultValue = "create_date", required = false) String sort){
         Flux<OutputWarningDto> allByExgausterNumber = warningsService.getAll(PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));
@@ -53,7 +50,7 @@ public class WarningController {
     }
 
     @GetMapping("/exgausters-warnings-history")
-    public Flux<OutputWarningDto> getWarningsHistory(@RequestParam(defaultValue = "1", required = false) int page,
+    public Flux<OutputWarningDto> getWarningsHistory(@RequestParam(defaultValue = "0", required = false) int page,
                                                                 @RequestParam(defaultValue = "20", required = false) int size,
                                                                 @RequestParam(defaultValue = "create_date", required = false) String sort){
         return warningsService.getAll(PageRequest.of(page, size, Sort.by(Sort.Order.by(sort))));

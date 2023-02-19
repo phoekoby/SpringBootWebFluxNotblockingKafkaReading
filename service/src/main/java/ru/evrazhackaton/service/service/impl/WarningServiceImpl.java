@@ -23,8 +23,8 @@ public class WarningServiceImpl implements WarningsService {
     MappingService mappingService;
 
     @Override
-    public Flux<OutputWarningDto> getAllByExgausterNumber(Integer exgauster, Pageable pageable) {
-        return warningRepository.getAllByExgauster(exgauster, pageable)
+    public Flux<OutputWarningDto> getAllByExgausterNumber(Integer exgauster, Integer limit, Integer offset, String sortedField) {
+        return warningRepository.getAllByExgauster(exgauster, limit, offset * limit, sortedField)
                 .flatMap(this::mapToOutput);
     }
 

@@ -33,9 +33,9 @@ public class ExgausterServiceImpl implements ExgausterService {
     }
 
     @Override
-    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number, Pageable pageable) {
+    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number, Integer page, Integer size, String sortedField) {
         return exgausterMomentRepository
-                .getAllByExgauster(number, pageable.getPageSize(), pageable.getPageNumber() * pageable.getPageNumber(), "moment")
+                .getAllByExgauster(number, size, page * size, "moment")
                 .flatMap(this::mapToOutput);
     }
 
