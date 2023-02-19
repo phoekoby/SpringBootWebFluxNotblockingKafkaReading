@@ -8,8 +8,9 @@ export class Socket {
         // localhost:8080/api/exgausters-realtime
         let eventSource = new EventSource("http://localhost:8080/api/exgausters-realtime")
         eventSource.addEventListener('message', event => {
-            alert(`Сказал: ${event.data}`);
+            console.log({event})
         })
+        eventSource.onmessage = (...args) => console.log(args)
         console.log({eventSource})
 
         const socket = new io(...args)
