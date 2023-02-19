@@ -27,7 +27,7 @@ export class Socket {
     onUpdate(callback){
         //this.#socket.on('update', callback)
         this.#eventSource.addEventListener('OutputExgausterMomentDto', event => {
-            callback(JSON.parse(event.data))
+            callback([JSON.parse(event.data)])
         })
     }
 
