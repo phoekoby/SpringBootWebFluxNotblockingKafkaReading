@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoring</title>
+    <script src="/client/js/app.js" type="module"></script>
+<!--    <script src="/client/js/exhauster.js" type="module"></script>-->
+<!--    <script src="/client/js/signal.js" type="module"></script>-->
+<!--    <script src="/client/js/socket.js" type="module"></script>-->
+    <script src="/client/js/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="/client/css/style.css" />
+</head>
+<body>
+
+
+<div id="content">
+    <div id="app"></div>
+</div>
+
+<script type="module">
+    'use strict'
+
+    import App from '/client/js/app.js'
+
+    const main = () => {
+
+        console.log('dom loaded')
+
+        const app = App.getInstance()
+        app.setIntervalTime(1000)
+        app.init()
+        console.log(app)
+
+    }
+    if(document.readyState === "complete" || document.readyState === "interactive"){
+        main()
+    }else{
+        document.addEventListener('DOMContentLoaded', main)
+    }
+</script>
+</body>
+</html>
