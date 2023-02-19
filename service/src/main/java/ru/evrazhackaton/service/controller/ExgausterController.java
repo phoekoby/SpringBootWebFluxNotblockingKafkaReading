@@ -5,10 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import ru.evrazhackaton.service.dto.OutputExgausterMomentDto;
 import ru.evrazhackaton.service.service.ExgausterService;
@@ -19,6 +16,7 @@ import java.util.Comparator;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@CrossOrigin
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExgausterController {
     ExgausterService exgausterService;
