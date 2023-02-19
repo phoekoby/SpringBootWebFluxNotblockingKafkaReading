@@ -4,13 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.dto.OutputExgausterMomentDto;
-import ru.evrazhackaton.service.entity.ExgausterMoment;
+import ru.evrazhackaton.service.entity.ExgausterMomentEntity;
 import ru.evrazhackaton.service.repository.ExgausterMomentRepository;
 import ru.evrazhackaton.service.service.ExgausterService;
 import ru.evrazhackaton.service.service.MappingService;
@@ -22,7 +24,7 @@ import ru.evrazhackaton.service.service.MappingService;
 public class ExgausterServiceImpl implements ExgausterService {
     ExgausterMomentRepository exgausterMomentRepository;
     MappingService mappingService;
-    static final Sort exgaustedSort = Sort.by(Sort.Direction.DESC,"moment");
+    Sinks.Many<InputExgausterMomentDto> realTimeExgausterSink;
 
     @Override
     public Flux<OutputExgausterMomentDto> saveAll(Flux<InputExgausterMomentDto> exgausterMomentDtoFlux) {
@@ -31,15 +33,15 @@ public class ExgausterServiceImpl implements ExgausterService {
     }
 
     @Override
-    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number) {
+    public Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number, Pageable pageable) {
         return exgausterMomentRepository
-                .getAllByExgauster(number, exgaustedSort)
+                .getAllByExgauster(number, pageable.getPageSize(), pageable.getPageNumber() * pageable.getPageNumber(), "moment")
                 .flatMap(this::mapToOutput);
     }
 
     @Override
-    public Flux<OutputExgausterMomentDto> getAll() {
-        return exgausterMomentRepository.findAll(exgaustedSort)
+    public Flux<OutputExgausterMomentDto> getAll(Pageable pageable) {
+        return exgausterMomentRepository.findAllBy(pageable)
                 .flatMap(this::mapToOutput);
     }
 
@@ -50,6 +52,24 @@ public class ExgausterServiceImpl implements ExgausterService {
                 .flatMap(this::mapFromInput)
                 .flatMap(exgausterMomentRepository::save)
                 .flatMap(this::mapToOutput);
+    }
+
+    @Override
+    public Flux<OutputExgausterMomentDto> getRealTimeByExgausterNumber(Integer exgausterNumber) {
+        return realTimeExgausterSink.asFlux()
+                .flatMap(this::convert)
+                .filter(outputExgausterMomentDto -> outputExgausterMomentDto.getExgausterId().equals(exgausterNumber));
+    }
+
+    @Override
+    public Flux<OutputExgausterMomentDto> getRealTimeOutput() {
+        return getRealTimeInput()
+                .flatMap(this::convert);
+    }
+
+    @Override
+    public Flux<InputExgausterMomentDto> getRealTimeInput() {
+        return realTimeExgausterSink.asFlux();
     }
 
     @Override
@@ -67,9 +87,9 @@ public class ExgausterServiceImpl implements ExgausterService {
     }
 
 
-    private Mono<ExgausterMoment> mapFromInput(InputExgausterMomentDto inputExgausterMomentDto){
+    private Mono<ExgausterMomentEntity> mapFromInput(InputExgausterMomentDto inputExgausterMomentDto){
         return mappingService.getByPlace(inputExgausterMomentDto.getKey())
-                .map(mappingEntity -> ExgausterMoment.builder()
+                .map(mappingEntity -> ExgausterMomentEntity.builder()
                         .exgauster(mappingEntity.getExgauster())
                         .mappingId(mappingEntity.getId())
                         .key(inputExgausterMomentDto.getKey())
@@ -78,16 +98,16 @@ public class ExgausterServiceImpl implements ExgausterService {
                         .build());
     }
 
-    private Mono<OutputExgausterMomentDto> mapToOutput(ExgausterMoment exgausterMoment){
-        return mappingService.getById(exgausterMoment.getMappingId())
+    private Mono<OutputExgausterMomentDto> mapToOutput(ExgausterMomentEntity exgausterMomentEntity){
+        return mappingService.getById(exgausterMomentEntity.getMappingId())
                 .map(mappingEntity -> OutputExgausterMomentDto.builder()
                         .exgausterId(mappingEntity.getExgauster())
                         .active(mappingEntity.getActive())
                         .comment(mappingEntity.getComment())
                         .signalType(mappingEntity.getType())
-                        .value(exgausterMoment.getValue())
-                        .code(exgausterMoment.getKey())
-                        .moment(exgausterMoment.getMoment())
+                        .value(exgausterMomentEntity.getValue())
+                        .code(exgausterMomentEntity.getKey())
+                        .moment(exgausterMomentEntity.getMoment())
                         .build());
     }
 }

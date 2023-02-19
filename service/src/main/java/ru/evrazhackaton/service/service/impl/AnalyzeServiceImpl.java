@@ -1,13 +1,20 @@
 package ru.evrazhackaton.service.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import reactor.util.function.Tuple2;
+import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.dto.OutputWarningDto;
-import ru.evrazhackaton.service.repository.ExgausterMomentRepository;
+import ru.evrazhackaton.service.entity.MappingEntity;
+import ru.evrazhackaton.service.entity.StatisticValueEntity;
 import ru.evrazhackaton.service.service.AnalyzeService;
+import ru.evrazhackaton.service.service.ExgausterService;
 import ru.evrazhackaton.service.service.MappingService;
 import ru.evrazhackaton.service.service.StatisticValueService;
 
@@ -17,47 +24,21 @@ import ru.evrazhackaton.service.service.StatisticValueService;
 public class AnalyzeServiceImpl implements AnalyzeService {
     MappingService mappingService;
     StatisticValueService statisticValueService;
-    private final ExgausterMomentRepository exgausterMomentRepository;
-
-   /* @PostConstruct
-    private Disposable analyse(){
-        notificationService.listen(NotificationTopic.MOMENT_SAVED, ExgausterMoment.class)
-                .flatMap(exgausterMoment -> Mono.zip(Mono.just(exgausterMoment), statisticValueService.getByMappingId(exgausterMoment.getMappingId()).defaultIfEmpty(new StatisticValue())))
-                .flatMap(tuple -> {
-                    StatisticValue exists = tuple.getT2();
-                    ExgausterMoment moment = tuple.getT1();
-                    if(exists.getId() == null){
-                        exists.setMappingId(moment.getMappingId());
-                        exists.setMaxValue(moment.getValue());
-                        exists.setMaxDeltaValue(0.0);
-                        exists.setMinDeltaValue(0.0);
-                        return statisticValueService.save(exists);
-                    }else{
-                        Double currentMax = exists.getMaxValue();
-                        Double currentMin = exists.getMinValue();
-                        Double prevValue = exists.getCurrValue();
-                        Double currValue = moment.getValue();
-
-                        double delta = Math.abs(currValue - prevValue);
-                        exists.setCurrValue(moment.getValue());
-                        BigDecimal result = new BigDecimal(exists.getAllSummedValue()).add(BigDecimal.valueOf(moment.getValue()));
-                        exists.setAllSummedValue(result.toString());
-                        exists.setCountOfAll(exists.getCountOfAll()+1);
-                        BigDecimal abs = result.divide(BigDecimal.valueOf(exists.getCountOfAll()));
-                        BigDecimal diffentWithMe = abs.min(new BigDecimal(currValue));
-                        outputSink.tryEmitNext();
-
-                    }
-                })
-    }*/
+    ExgausterService exgausterService;
+    Sinks.Many<OutputWarningDto> realTimeWarningsSink;
 
     @Override
-    public Flux<OutputWarningDto> getWarnings() {
-        return null;
-    }
-
-    @Override
-    public Flux<OutputWarningDto> getWarnings(Integer exgauster) {
-        return null;
+    @PostConstruct
+    public Disposable analyse(){
+        return exgausterService.getRealTimeInput()
+                .flatMap(inputExgausterMomentDto -> Mono.zip(Mono.just(inputExgausterMomentDto), mappingService.getByPlace(inputExgausterMomentDto.getKey())))
+                .flatMap(tuple -> Mono.zip(Mono.just(tuple), statisticValueService.getByMappingId(tuple.getT2().getId()).defaultIfEmpty(new StatisticValueEntity())))
+                /*.flatMap(tuple -> {
+                    Tuple2<InputExgausterMomentDto, MappingEntity> data = tuple.getT1();
+                    InputExgausterMomentDto exgausterMomentDto = data.getT1();
+                    MappingEntity mapping = data.getT2();
+                    StatisticValueEntity statisticValue = tuple.getT2();
+                })*/
+                .subscribe();
     }
 }

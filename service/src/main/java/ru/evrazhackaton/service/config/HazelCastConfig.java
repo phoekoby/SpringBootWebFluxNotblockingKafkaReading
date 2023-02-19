@@ -8,7 +8,7 @@ import com.hazelcast.map.IMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.evrazhackaton.service.entity.MappingEntity;
-import ru.evrazhackaton.service.entity.StatisticValue;
+import ru.evrazhackaton.service.entity.StatisticValueEntity;
 
 import java.util.UUID;
 
@@ -31,12 +31,12 @@ public class HazelCastConfig {
     }
 
     @Bean
-    public IMap<Long, StatisticValue> statisticValueCacheById(HazelcastInstance hazelcastInstanceBean){
+    public IMap<Long, StatisticValueEntity> statisticValueCacheById(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("statisticValueCacheById");
     }
 
     @Bean
-    public IMap<Long, StatisticValue> statisticValueCacheByMappingId(HazelcastInstance hazelcastInstanceBean){
+    public IMap<Long, StatisticValueEntity> statisticValueCacheByMappingId(HazelcastInstance hazelcastInstanceBean){
         return hazelcastInstanceBean.getMap("statisticValueCacheByMappingId");
     }
 }

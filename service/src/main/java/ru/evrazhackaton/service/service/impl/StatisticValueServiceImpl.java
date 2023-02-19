@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import ru.evrazhackaton.service.entity.StatisticValue;
+import ru.evrazhackaton.service.entity.StatisticValueEntity;
 import ru.evrazhackaton.service.repository.MappingRepository;
 import ru.evrazhackaton.service.repository.StatisticValueRepository;
 import ru.evrazhackaton.service.service.StatisticValueService;
@@ -17,25 +17,25 @@ import java.util.concurrent.TimeUnit;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class StatisticValueServiceImpl implements StatisticValueService {
-    IMap<Long, StatisticValue> statisticValueCacheById;
-    IMap<Long, StatisticValue> statisticValueCacheByMappingId;
+    IMap<Long, StatisticValueEntity> statisticValueCacheById;
+    IMap<Long, StatisticValueEntity> statisticValueCacheByMappingId;
     MappingRepository mappingRepository;
     StatisticValueRepository statisticValueRepository;
 
 
     @Override
-    public Mono<StatisticValue> getByMappingId(Long mappingId) {
+    public Mono<StatisticValueEntity> getByMappingId(Long mappingId) {
         return Mono.fromCompletionStage(statisticValueCacheByMappingId.getAsync(mappingId)
-                .thenApply(statisticValue -> {
-                    if(statisticValue == null)
-                        return new StatisticValue();
-                    return statisticValue;
+                .thenApply(statisticValueEntity -> {
+                    if(statisticValueEntity == null)
+                        return new StatisticValueEntity();
+                    return statisticValueEntity;
                 }))
-                .flatMap(statisticValue -> {
-                    if(statisticValue.getId() == null){
+                .flatMap(statisticValueEntity -> {
+                    if(statisticValueEntity.getId() == null){
                         return Mono.zip(statisticValueRepository.getByMappingId(mappingId), Mono.just(true));
                     }
-                    return Mono.zip(Mono.just(statisticValue), Mono.just(false));
+                    return Mono.zip(Mono.just(statisticValueEntity), Mono.just(false));
                 })
                 .flatMap(tuple -> {
                     boolean needToCache = tuple.getT2();
@@ -47,9 +47,9 @@ public class StatisticValueServiceImpl implements StatisticValueService {
     }
 
     @Override
-    public Mono<StatisticValue> save(StatisticValue statisticValue) {
-        return statisticValueRepository.save(statisticValue)
-                .flatMap(savedValue -> Mono.fromCompletionStage(statisticValueCacheByMappingId.putAsync(statisticValue.getId(), statisticValue, 2, TimeUnit.HOURS)));
+    public Mono<StatisticValueEntity> save(StatisticValueEntity statisticValueEntity) {
+        return statisticValueRepository.save(statisticValueEntity)
+                .flatMap(savedValue -> Mono.fromCompletionStage(statisticValueCacheByMappingId.putAsync(statisticValueEntity.getId(), statisticValueEntity, 2, TimeUnit.HOURS)));
     }
 
     @Override

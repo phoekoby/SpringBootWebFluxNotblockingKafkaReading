@@ -26,7 +26,21 @@ CREATE TABLE statistic_value
     min_value  numeric default 0,
     curr_value numeric default 0,
     max_delta_value numeric default 0,
-    min_delta_value numeric default 0
+    min_delta_value numeric default 0,
+    all_summed_value varchar default '0.0',
+    count_of_all bigint default 0,
+    create_date date default now(),
+    update_date date default now()
+);
+
+CREATE TABLE warning
+(
+    id         BIGSERIAL PRIMARY KEY,
+    mapping_id bigint references mapping (id),
+    reason  varchar,
+    warning_type  varchar,
+    create_date date default now(),
+    update_date date default now()
 );
 
 INSERT INTO mapping (place, type, comment, exgauster, active)

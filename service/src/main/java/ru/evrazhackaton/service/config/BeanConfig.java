@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Sinks;
 import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
+import ru.evrazhackaton.service.dto.OutputWarningDto;
 
 @Configuration
 public class BeanConfig {
@@ -20,6 +21,11 @@ public class BeanConfig {
 
     @Bean
     public Sinks.Many<InputExgausterMomentDto> realTimeExgausterSink(){
+        return Sinks.many().multicast().directBestEffort();
+    }
+
+    @Bean
+    public Sinks.Many<OutputWarningDto> realTimeWarningsSink(){
         return Sinks.many().multicast().directBestEffort();
     }
 

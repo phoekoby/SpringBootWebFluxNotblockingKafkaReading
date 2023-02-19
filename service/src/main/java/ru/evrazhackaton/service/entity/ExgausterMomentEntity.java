@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
 
-@Table
+@Table("exgauster_moment")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 @Accessors(chain = true)
 @ToString
 @Jacksonized
-public class ExgausterMoment {
+public class ExgausterMomentEntity {
     @Id
     Long id;
 

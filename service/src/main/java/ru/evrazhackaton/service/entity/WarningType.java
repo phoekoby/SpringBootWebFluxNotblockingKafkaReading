@@ -1,4 +1,4 @@
-package ru.evrazhackaton.service.dto;
+package ru.evrazhackaton.service.entity;
 
 public enum WarningType {
     CRITICAL,

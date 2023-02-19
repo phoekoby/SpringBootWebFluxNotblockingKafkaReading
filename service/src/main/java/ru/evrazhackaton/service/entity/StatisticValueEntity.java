@@ -1,9 +1,13 @@
 package ru.evrazhackaton.service.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.Date;
 
 @Table("statistic_value")
 @Getter
@@ -11,7 +15,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StatisticValue {
+public class StatisticValueEntity {
 
     @Id
     Long id;
@@ -39,4 +43,12 @@ public class StatisticValue {
 
     @Column("count_of_all")
     Long countOfAll;
+
+    @Column("create_date")
+    @CreatedDate
+    Date createDate;
+
+    @Column("update_date")
+    @LastModifiedDate
+    Date updateDate;
 }
