@@ -8,12 +8,9 @@ import com.hazelcast.map.IMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.evrazhackaton.service.entity.MappingEntity;
-import ru.evrazhackaton.service.entity.NotificationTopic;
 import ru.evrazhackaton.service.entity.StatisticValue;
-import ru.evrazhackaton.service.pojo.HazelSet;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class HazelCastConfig {
@@ -21,12 +18,6 @@ public class HazelCastConfig {
     @Bean
     public HazelcastInstance hazelcastInstanceBean() {
         return Hazelcast.newHazelcastInstance(new Config().setClassLoader(this.getClass().getClassLoader()).setInstanceName(UUID.randomUUID().toString()));
-    }
-
-    @Bean
-    public HazelSet<NotificationTopic> watchedTopicsSet(HazelcastInstance hazelcastInstanceBean){
-        IMap<NotificationTopic, NotificationTopic> watchedTopics = hazelcastInstanceBean.getMap("watchedTopicsMap");
-        return new HazelSet<>(watchedTopics, 1, TimeUnit.MINUTES);
     }
 
     @Bean

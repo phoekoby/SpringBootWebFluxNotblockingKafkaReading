@@ -33,4 +33,10 @@ public class StatisticValue {
 
     @Column("min_delta_value")
     Double minDeltaValue;
+
+    @Column("all_summed_value")
+    String allSummedValue;
+
+    @Column("count_of_all")
+    Long countOfAll;
 }

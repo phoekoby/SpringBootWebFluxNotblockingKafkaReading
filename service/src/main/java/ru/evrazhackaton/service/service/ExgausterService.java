@@ -9,7 +9,6 @@ public interface ExgausterService {
     Flux<OutputExgausterMomentDto> saveAll(Flux<InputExgausterMomentDto> exgausterMomentDtoFlux);
     Flux<OutputExgausterMomentDto> getByExgausterNumber(Integer number);
     Flux<OutputExgausterMomentDto> getAll();
-    Flux<OutputExgausterMomentDto> listenToSaved(Integer number);
-    Flux<OutputExgausterMomentDto> listenToSaved();
     Mono<OutputExgausterMomentDto> save(InputExgausterMomentDto dto);
+    Mono<OutputExgausterMomentDto> convert(InputExgausterMomentDto dto);
 }

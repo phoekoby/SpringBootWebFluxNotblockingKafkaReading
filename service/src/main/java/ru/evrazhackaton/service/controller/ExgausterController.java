@@ -7,11 +7,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
+import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.dto.OutputExgausterMomentDto;
 import ru.evrazhackaton.service.service.ExgausterService;
 
 import java.time.Duration;
-import java.util.Comparator;
 
 @RestController
 @RequestMapping("/api")
@@ -20,11 +21,12 @@ import java.util.Comparator;
 @CrossOrigin
 public class ExgausterController {
     ExgausterService exgausterService;
+    Sinks.Many<InputExgausterMomentDto> realTimeExgausterSink;
 
     @GetMapping("/exgauster-history-with-realtime/{number}")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getHistoryWithRealTime(@PathVariable Integer number){
         Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getByExgausterNumber(number);
-        Flux<OutputExgausterMomentDto> listenCurrent = exgausterService.listenToSaved(number);
+        Flux<OutputExgausterMomentDto> listenCurrent = realTimeExgausterSink.asFlux().flatMap(exgausterService::convert);
         return Flux.merge(byExgausterNumber, listenCurrent)
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
@@ -45,17 +47,20 @@ public class ExgausterController {
 
     @GetMapping("/exgauster-realtime/{number}")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyRealTime(@PathVariable Integer number){
-         return exgausterService.listenToSaved(number)
-                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
-                    .retry(Duration.ofSeconds(4L))
-                    .event(event.getClass().getSimpleName())
-                    .data(event)
-                    .build());
+        return realTimeExgausterSink.asFlux()
+                .flatMap(exgausterService::convert)
+                .filter(outputExgausterMomentDto -> outputExgausterMomentDto.getExgausterId().equals(number))
+                .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
+                        .retry(Duration.ofSeconds(4L))
+                        .event(event.getClass().getSimpleName())
+                        .data(event)
+                        .build());
     }
 
     @GetMapping("/exgausters-realtime")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getOnlyRealTimeForAll(){
-        return exgausterService.listenToSaved()
+        return realTimeExgausterSink.asFlux()
+                .flatMap(exgausterService::convert)
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))
                         .event(event.getClass().getSimpleName())
@@ -76,7 +81,7 @@ public class ExgausterController {
     @GetMapping("/exgausters-history-with-realtime")
     public Flux<ServerSentEvent<OutputExgausterMomentDto>> getHistoryWithRealTimeForAll(){
         Flux<OutputExgausterMomentDto> byExgausterNumber = exgausterService.getAll();
-        Flux<OutputExgausterMomentDto> listenCurrent = exgausterService.listenToSaved();
+        Flux<OutputExgausterMomentDto> listenCurrent = realTimeExgausterSink.asFlux().flatMap(exgausterService::convert);
         return Flux.merge(byExgausterNumber, listenCurrent)
                 .map(event -> ServerSentEvent.<OutputExgausterMomentDto>builder()
                         .retry(Duration.ofSeconds(4L))

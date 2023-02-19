@@ -5,13 +5,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
-import ru.evrazhackaton.service.ServiceApplication;
 import ru.evrazhackaton.service.dto.InputExgausterMomentDto;
 import ru.evrazhackaton.service.service.ExgausterService;
 
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 public class ExgausterConsumer {
     ReactiveKafkaConsumerTemplate<String, Map<String, Object>> reactiveKafkaConsumerTemplate;
     ExgausterService exgausterService;
+    Sinks.Many<InputExgausterMomentDto> realTimeExgausterSink;
 
     @PostConstruct
     public Disposable listen(){
@@ -53,6 +53,7 @@ public class ExgausterConsumer {
                         return Flux.error(new RuntimeException(e));
                     }
                 })
+                .doOnNext(realTimeExgausterSink::tryEmitNext)
                 .flatMap(exgausterService::save)
                 .subscribe();
     }
