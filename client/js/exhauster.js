@@ -1,17 +1,24 @@
 'use strict'
 
 import {Signal} from "/client/js/signal.js";
+import App from "/client/js/app.js";
 
 export class Exhauster {
 
     #signals = {}
     #updates = []
 
-    constructor(signals) {
-        if(!signals.length && signals.length !== 0){
+    constructor(id, signals) {
+        if((!signals.length && signals.length !== 0) || id*1 < 0){
             throw new Error('Invalid exhauster data')
         }
         this.addSignals(signals)
+        setTimeout(() => {
+            const all_signals = App.getInstance().getSignalsForExhausterFromHierarchy(id)
+            all_signals.forEach(({comment}) => {
+                this.#signals[comment] = this.#signals[comment] || new Signal(comment)
+            })
+        }, 0)
     }
 
     getSignals(){

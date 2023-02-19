@@ -2,6 +2,7 @@
 
 import {Socket} from "/client/js/socket.js";
 import {Exhauster} from "/client/js/exhauster.js";
+import Hierarchy from "/client/js/hierarchy.js";
 import {IndexWidget} from "/client/js/widgets/index.js";
 
 class App {
@@ -13,6 +14,7 @@ class App {
     #interval = 0
     #widgets = {}
     #stopped = false
+    #hierarchy
 
     constructor() {
         if(App.INSTANCE){
@@ -32,10 +34,15 @@ class App {
             this.error('No viewport element found')
             throw new Error('No viewport element found by id #app')
         }
-        this.refreshConnection()
-        this.addWidgets()
-        setTimeout(this.render, this.#interval)
-        this.#inited = true
+        (new Hierarchy()).getData()
+            .then((data) => {
+                console.log(data)
+                this.#hierarchy = data
+                this.refreshConnection()
+                this.addWidgets()
+                setTimeout(this.render, this.#interval)
+                this.#inited = true
+            })
     }
 
     setIntervalTime(ms) {
@@ -51,7 +58,7 @@ class App {
             console.log({id, exhauster})
             return
         }
-        this.#exhausters[id] = new Exhauster(exhauster)
+        this.#exhausters[id] = new Exhauster(id, exhauster)
     }
 
     refreshConnection = () => {
@@ -81,6 +88,10 @@ class App {
 
     getExhausterById(id){
         return this.#exhausters[id]
+    }
+
+    getSignalsForExhausterFromHierarchy(id) {
+        return this.#hierarchy.filter(row => row.exgauster*1 === id*1)
     }
 
     update = (_data) => {

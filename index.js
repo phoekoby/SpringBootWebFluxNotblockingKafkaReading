@@ -8,7 +8,7 @@ const TPS = 1
 app.get("/", (req, res) => res.sendFile(__dirname + "/client/index.html"))
 app.use("/client", express.static(__dirname + "/client"))
 
-serv.listen(process.env.PORT || 2000)
+serv.listen(process.env.PORT || 3000)
 console.log("Server started")
 
 SOCKET_LIST = {}
