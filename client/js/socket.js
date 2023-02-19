@@ -3,23 +3,14 @@
 export class Socket {
 
     #socket
+    #eventSource
 
     constructor(...args) {
         // localhost:8080/api/exgausters-realtime
         let eventSource = new EventSource("http://localhost:8080/api/exgausters-realtime")
-        eventSource.addEventListener('OutputExgausterMomentDto', event => {
-            console.log({event})
-        })
-        eventSource.onmessage = (...args) => console.log(args)
-        console.log({eventSource})
+        this.#eventSource = eventSource
 
         const socket = new io(...args)
-        console.log(socket)
-
-
-        socket.on('update', (...args) => {
-            //console.log('socket update', ...args)
-        })
         this.#socket = socket
     }
 
@@ -34,7 +25,10 @@ export class Socket {
     }
 
     onUpdate(callback){
-        this.#socket.on('update', callback)
+        //this.#socket.on('update', callback)
+        this.#eventSource.addEventListener('OutputExgausterMomentDto', event => {
+            callback(JSON.parse(event.data))
+        })
     }
 
     emit(event, ...args){
