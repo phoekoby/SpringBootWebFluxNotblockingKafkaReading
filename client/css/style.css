@@ -1,0 +1,141 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #fefefe;
+}
+
+#app {
+    width: 1800px;
+    max-width: 96vw;
+    margin: 50px auto;
+}
+#app:not(.inited) {
+    position: relative;
+}
+#app:not(.inited)::before {
+    content: 'Загрузка...';
+    position: fixed;
+    left: 50vw;
+    top: 50vh;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: #333;
+}
+
+.widget-index {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+.widget-exhauster-preview {
+    width: 30%;
+    padding: 15px;
+    margin: 15px 1.51515%;
+    background: #fff;
+    position: relative;
+    box-shadow: 1px 1px 3px #3333;
+}
+.widget-exhauster-preview-button {
+    position: absolute;
+    right: 30px;
+    top: 22px;
+    padding: 5px 8px;
+    box-shadow: 1px 1px 3px #3333;
+    cursor: pointer;
+    border: 2px solid #0073db;
+    background: #fff;
+    color: #0073db;
+    text-align: center;
+    transition: .15s;
+}
+.widget-exhauster-preview-button:hover {
+    background: #0073db;
+    color: #fff;
+}
+.widget-exhauster-title,
+.widget-popup-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0073db;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden auto;
+    padding: 50px;
+    z-index: 100;
+    background: #fff;
+}
+.widget-popup-content, .widget-popup-title {
+    width: 1400px;
+    max-width: 90%;
+    margin: 0 auto;
+}
+.widget-popup-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+.widget-popup-close {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 28px;
+    line-height: 30px;
+    transform: rotate(45deg);
+    cursor: pointer;
+}
+.widget-popup-close:hover {
+    color: #0073db;
+}
+
+.widget-popup-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+.widget-popup-content .widget-signal-preview {
+    width: calc(50% - 20px);
+    margin: 0 10px 12px;
+    min-width: 300px;
+    display: inline-block;
+    background: #fefefe;
+    box-shadow: 1px 1px 3px #3333;
+}
+.widget-signal-preview > span {
+    display: inline-block;
+    width: 60%;
+    padding: 5px;
+    vertical-align: middle;
+}
+.widget-signal-preview > span + span {
+    text-align: right;
+    width: 40%;
+    color: #333;
+    font-weight: 600;
+}
+
+.widget-signal-preview {
+    border-left: 4px solid #0073db;
+    cursor: pointer;
+    padding: 5px;
+}
+.widget-signal-preview:hover {
+    background: #fefefe;
+}
+
+.timediff {
+    color: #611717;
+}
+
